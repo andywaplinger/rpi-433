@@ -157,7 +157,7 @@ void RCSwitch::switchOff(int nAddressCode, int nChannelCode) {
  * @param sGroup        Code of the switch group (refers to DIP switches 1..5 where "1" = on and "0" = off, if all DIP switches are on it's "11111")
  * @param nChannelCode  Number of the switch itself (1..4)
  */
-void RCSwitch::switchOn(char* sGroup, int nChannel) {
+void RCSwitch::switchOn(char sGroup, int nChannel) {
   this->sendTriState( this->getCodeWordA(sGroup, nChannel, true) );
 }
 
@@ -167,7 +167,7 @@ void RCSwitch::switchOn(char* sGroup, int nChannel) {
  * @param sGroup        Code of the switch group (refers to DIP switches 1..5 where "1" = on and "0" = off, if all DIP switches are on it's "11111")
  * @param nChannelCode  Number of the switch itself (1..4)
  */
-void RCSwitch::switchOff(char* sGroup, int nChannel) {
+void RCSwitch::switchOff(char sGroup, int nChannel) {
   this->sendTriState( this->getCodeWordA(sGroup, nChannel, false) );
 }
 
@@ -187,11 +187,11 @@ void RCSwitch::switchOff(char* sGroup, int nChannel) {
  *
  * @return char[13]
  */
-char* RCSwitch::getCodeWordB(int nAddressCode, int nChannelCode, boolean bStatus) {
+char RCSwitch::getCodeWordB(int nAddressCode, int nChannelCode, boolean bStatus) {
    int nReturnPos = 0;
    static char sReturn[13];
    
-   const char* code[5] = { "FFFF", "0FFF", "F0FF", "FF0F", "FFF0" };
+   const char code[5] = { "FFFF", "0FFF", "F0FF", "FF0F", "FFF0" };
    if (nAddressCode < 1 || nAddressCode > 4 || nChannelCode < 1 || nChannelCode > 4) {
     return '\0';
    }
@@ -222,11 +222,11 @@ char* RCSwitch::getCodeWordB(int nAddressCode, int nChannelCode, boolean bStatus
 /**
  * Like getCodeWord  (Type A)
  */
-char* RCSwitch::getCodeWordA(char* sGroup, int nChannelCode, boolean bStatus) {
+char RCSwitch::getCodeWordA(char sGroup, int nChannelCode, boolean bStatus) {
    int nReturnPos = 0;
    static char sReturn[13];
 
-  const char* code[6] = { "FFFFF", "0FFFF", "F0FFF", "FF0FF", "FFF0F", "FFFF0" };
+  const char code[6] = { "FFFFF", "0FFFF", "F0FFF", "FF0FF", "FFF0F", "FFFF0" };
 
   if (nChannelCode < 1 || nChannelCode > 5) {
       return '\0';
@@ -261,7 +261,7 @@ char* RCSwitch::getCodeWordA(char* sGroup, int nChannelCode, boolean bStatus) {
 /**
  * Like getCodeWord (Type C = Intertechno)
  */
-char* RCSwitch::getCodeWordC(char sFamily, int nGroup, int nDevice, boolean bStatus) {
+char RCSwitch::getCodeWordC(char sFamily, int nGroup, int nDevice, boolean bStatus) {
   static char sReturn[13];
   int nReturnPos = 0;
   
@@ -269,7 +269,7 @@ char* RCSwitch::getCodeWordC(char sFamily, int nGroup, int nDevice, boolean bSta
     return '\0';
   }
   
-  char* sDeviceGroupCode =  dec2binWzerofill(  (nDevice-1) + (nGroup-1)*4, 4  );
+  char sDeviceGroupCode =  dec2binWzerofill(  (nDevice-1) + (nGroup-1)*4, 4  );
   char familycode[16][5] = { "0000", "F000", "0F00", "FF00", "00F0", "F0F0", "0FF0", "FFF0", "000F", "F00F", "0F0F", "FF0F", "00FF", "F0FF", "0FFF", "FFFF" };
   for (int i = 0; i<4; i++) {
     sReturn[nReturnPos++] = familycode[ (int)sFamily - 97 ][i];
@@ -293,7 +293,7 @@ char* RCSwitch::getCodeWordC(char sFamily, int nGroup, int nDevice, boolean bSta
  * Sends a Code Word
  * @param sCodeWord   /^[10FS]*$/  -> see getCodeWord
  */
-void RCSwitch::sendTriState(char* sCodeWord) {
+void RCSwitch::sendTriState(char sCodeWord) {
   for (int nRepeat=0; nRepeat<nRepeatTransmit; nRepeat++) {
     int i = 0;
     while (sCodeWord[i] != '\0') {
@@ -318,7 +318,7 @@ void RCSwitch::send(unsigned long Code, unsigned int length) {
   this->send( this->dec2binWzerofill(Code, length) );
 }
 
-void RCSwitch::send(char* sCodeWord) {
+void RCSwitch::send(char sCodeWord) {
   for (int nRepeat=0; nRepeat<nRepeatTransmit; nRepeat++) {
     int i = 0;
     while (sCodeWord[i] != '\0') {
@@ -596,7 +596,7 @@ void RCSwitch::handleInterrupt() {
 /**
   * Turns a decimal value to its binary representation
   */
-char* RCSwitch::dec2binWzerofill(unsigned long Dec, unsigned int bitLength){
+char RCSwitch::dec2binWzerofill(unsigned long Dec, unsigned int bitLength){
   static char bin[64];
   unsigned int i=0;
 
